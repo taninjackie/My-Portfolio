@@ -46,7 +46,8 @@ const StyledTab = styled((props: StyledTabProps) => (
     },
     "&.Mui-focusVisible": {
         backgroundColor: "rgba(100, 95, 228, 0.32)"
-    }
+    },
+
 }));
 
 const BoxOfLightModeIconStyle: SxProps = {
@@ -59,7 +60,7 @@ const BoxOfLightModeIconStyle: SxProps = {
     '&:hover': {
         backgroundColor: "#F6F65E"
     },
-    transition: "background-color 0.3s ease",
+    transition: "all .35s ease-in-out",
 }
 const LightModeIconStyle: SxProps = {
     paddingTop: "6px",
@@ -78,14 +79,61 @@ const BoxOfLightModeIconMobileStyle: SxProps = {
     '&:hover': {
         backgroundColor: "#F6F65E"
     },
-    transition: "background-color 0.3s ease",
+    transition: "all .35s ease-in-out",
 }
+const DehazeOutlinedBoxStyle:SxProps = {
+    width:"40px" , 
+    height:"30px" , 
+    background:"white",
+    margin: "30px 0 auto 0",
+    textAlign: "center",
+    borderRadius : "4px"
+}
+
+
 export const Navbar = ({ }) => {
-    const [value, setValue] = React.useState(0);
-    const LightIconMobileMediaQuery = useMediaQuery("(max-width:1054px)");
+    const [value, setValue] = React.useState(4);
+    //responsive value
+    const match610px = useMediaQuery("(max-width:610px)");
+    const match1054px = useMediaQuery("(max-width:1054px)");
+    let navbarPaddingLeft = "100px"
+
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
+
+    //Component variable
+    let lightBoxComponent, StyledTabComponent , DehazeOutlinedComponent;
+
+    if (match1054px) {
+        lightBoxComponent = <Box sx={BoxOfLightModeIconMobileStyle}><LightModeIcon sx={LightModeIconStyle} /></Box>
+    }
+    else {
+        lightBoxComponent = <Box sx={BoxOfLightModeIconStyle}><LightModeIcon sx={LightModeIconStyle} /></Box>
+    }
+    if (match610px) {
+        StyledTabComponent = ""
+        navbarPaddingLeft  = "50px"
+        DehazeOutlinedComponent = 
+        <>
+        <Box sx={DehazeOutlinedBoxStyle}>
+            <DehazeOutlinedIcon style={{color : "black" , paddingTop: "3px" }}/>
+        </Box>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </>
+    }
+    else {
+        StyledTabComponent = 
+        <>
+        <Box>
+            <StyledTabs sx={{ marginTop: "22px" }} value={value} onChange={handleChange} aria-label="tabs">
+                <StyledTab label="Projects" />
+                <StyledTab label="Posts" />
+                <StyledTab label="Source" />
+            </StyledTabs>
+        </Box>
+        </>
+    }
     return (
         <Container>
             <nav id="navbar" style={{
@@ -95,21 +143,13 @@ export const Navbar = ({ }) => {
                 color: "white",
                 display: "flex",
                 flexDirection: "row",
-                paddingLeft:"100px"
+                paddingLeft: navbarPaddingLeft
             }}>
-                <div style={{ marginTop: "9px" }}><h1>Tanin Limsiriwong</h1></div>
+                <div style={{ marginTop: "9px" }}><h1><a style={{ textDecoration: "none", color: "white" }} href="/">Tanin Limsiriwong</a></h1></div>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <Box>
-                    <StyledTabs sx={{ marginTop: "22px" }} value={value} onChange={handleChange} aria-label="tabs">
-                        <StyledTab label="Projects" />
-                        <StyledTab label="Posts" />
-                        <StyledTab label="Source" />
-                    </StyledTabs>
-                </Box>
-                {LightIconMobileMediaQuery ? 
-                <Box sx={BoxOfLightModeIconMobileStyle}><LightModeIcon sx={LightModeIconStyle} /></Box>
-                :<Box sx={BoxOfLightModeIconStyle}><LightModeIcon sx={LightModeIconStyle} /></Box>
-                }
+                    {DehazeOutlinedComponent}
+                    {StyledTabComponent}
+                {lightBoxComponent}
             </nav>
         </Container>
     )
