@@ -3,6 +3,7 @@ body {
     font-family: 'Roboto Mono', monospace;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: all 0.3s ease-in-out;
 }
 
 code {

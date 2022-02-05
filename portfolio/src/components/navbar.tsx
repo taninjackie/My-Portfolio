@@ -1,11 +1,11 @@
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Grid, Tabs, Tab, Box } from "@mui/material";
 import { styled, SxProps } from '@mui/material/styles';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 import useMediaQuery from "@mui/material/useMediaQuery";
 import DehazeOutlinedIcon from '@mui/icons-material/DehazeOutlined';
 import CSS from "csstype";
-
 
 interface StyledTabsProps {
     children?: React.ReactNode;
@@ -22,44 +22,6 @@ let MyTheme: any = {
     indicatorSpanColor: "#FFFFAB"
 }
 
-
-
-//StyledTabs Varible
-const StyledTabs = styled((props: StyledTabsProps) => (
-    <Tabs
-        {...props}
-        TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
-    />
-))({
-    "& .MuiTabs-indicator": {
-        display: "flex",
-        justifyContent: "center",
-        backgroundColor: "transparent"
-    },
-    "& .MuiTabs-indicatorSpan": {
-        maxWidth: 60,
-        width: "100%",
-        backgroundColor: MyTheme.indicatorSpanColor
-    }
-});
-
-const StyledTab = styled((props: StyledTabProps) => (
-    <Tab disableRipple {...props} />
-))(({ theme }) => ({
-    textTransform: "none",
-    fontWeight: theme.typography.fontWeightRegular,
-    fontSize: theme.typography.pxToRem(15),
-    marginRight: theme.spacing(1),
-    color: "rgba(255, 255, 255, 0.7)",
-    "&.Mui-selected": {
-        color: "#fff"
-    },
-    "&.Mui-focusVisible": {
-        backgroundColor: "rgba(100, 95, 228, 0.32)"
-    },
-
-}));
-
 const BoxOfLightModeIconStyle: SxProps = {
     borderRadius: "4px",
     margin: "35px 0 auto 150px",
@@ -72,9 +34,28 @@ const BoxOfLightModeIconStyle: SxProps = {
     },
     transition: "all .35s ease-in-out",
 }
+const BoxOfDarkModeIconStyle:SxProps = {
+    borderRadius: "4px",
+    margin: "35px 0 auto 150px",
+    width: "40px",
+    height: "30px",
+    backgroundColor: "#805AD5",
+    textAlign: "center",
+    '&:hover': {
+        backgroundColor: "#F6F65E"
+    },
+    transition: "all .35s ease-in-out",
+}
 const LightModeIconStyle: SxProps = {
     paddingTop: "6px",
     color: "black",
+    justifyContent: "center",
+    fontSize: "medium",
+    textAlign: "center"
+}
+const DarkModeIconStyle: SxProps = {
+    paddingTop: "6px",
+    color: "white",
     justifyContent: "center",
     fontSize: "medium",
     textAlign: "center"
@@ -91,6 +72,18 @@ const BoxOfLightModeIconMobileStyle: SxProps = {
     },
     transition: "all .35s ease-in-out",
 }
+const BoxOfDarkModeIconMobileStyle: SxProps = {
+    borderRadius: "4px",
+    margin: "35px 0 auto 50px",
+    width: "40px",
+    height: "30px",
+    backgroundColor: "#805AD5",
+    textAlign: "center",
+    '&:hover': {
+        backgroundColor: "#F6F65E"
+    },
+    transition: "all .35s ease-in-out",
+}
 const DehazeOutlinedBoxStyle: SxProps = {
     width: "40px",
     height: "30px",
@@ -100,12 +93,56 @@ const DehazeOutlinedBoxStyle: SxProps = {
     borderRadius: "4px"
 }
 
+//StyledTabs Varible
+const StyledTabs = styled((props: StyledTabsProps) => (
+    <Tabs
+        {...props}
+        TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
+    />
+))({
+    "& .MuiTabs-indicator": {
+        display: "flex",
+        justifyContent: "center",
+        backgroundColor: "transparent"
+    },
+    "& .MuiTabs-indicatorSpan": {
+        maxWidth: 60,
+        width: "100%",
+        backgroundColor: "#FFFFAB"
+    }
+});
 
+const StyledTab = styled((props: StyledTabProps) => (
+    <Tab disableRipple {...props} />
+))(({ theme }) => ({
+    textTransform: "none",
+    fontWeight: theme.typography.fontWeightRegular,
+    fontSize: theme.typography.pxToRem(15),
+    marginRight: theme.spacing(1),
+    color: MyTheme.color,
+    "&.Mui-selected": {
+        color: MyTheme.color
+    },
+    "&.Mui-focusVisible": {
+        backgroundColor: "rgba(100, 95, 228, 0.32)"
+    },
+
+}));
 
 export const Navbar = ({ }) => {
     const [value, setValue] = React.useState(Number(null));
     const [theme, setTheme] = useState(false)
-    const [themeFnCount, setthemeFnCount] = useState(0)
+
+    let ToggleThemeButton ;
+
+    const changeToLightTheme = () => {
+        setTheme(!theme);
+        localStorage.setItem("theme", "true");
+    }
+    const changeToDarkTheme = () =>{
+        setTheme(!theme);
+        localStorage.setItem("theme", "false");
+    }
 
     //TitleStyle
     let TitleSize: string = "25px"
@@ -120,22 +157,15 @@ export const Navbar = ({ }) => {
     let StyledTabComponent, DehazeOutlinedComponent;
 
     //Component Style
-    let lightBoxComponentStyle: SxProps
-
+    let lightBoxComponentStyle: SxProps;
+    let darkBoxComponentStyle : SxProps;
     //Media Query
     const match925px: boolean = useMediaQuery("(max-width:925px)");
-    //const match1054px: boolean = useMediaQuery("(max-width:1054px)");
     let navbarPaddingLeft: string = "100px"
-    /*
-    if (match1054px) {
-        lightBoxComponentStyle = BoxOfLightModeIconMobileStyle
-    }
-    else {
-        lightBoxComponentStyle = BoxOfLightModeIconStyle
-    }*/
 
     if (match925px) {
         lightBoxComponentStyle = BoxOfLightModeIconMobileStyle
+        darkBoxComponentStyle  = BoxOfDarkModeIconMobileStyle
         StyledTabComponent = ""
         navbarPaddingLeft = "5px"
         TitleSize = "27px"
@@ -149,9 +179,16 @@ export const Navbar = ({ }) => {
     }
     else {
         lightBoxComponentStyle = BoxOfLightModeIconStyle
+        darkBoxComponentStyle  = BoxOfDarkModeIconStyle
         StyledTabComponent =
             <Box>
-                <StyledTabs sx={{ marginTop: "25px", paddingLeft: "50px" }} value={value} onChange={handleChange} aria-label="tabs">
+                <StyledTabs sx={{
+                    marginTop: "25px", paddingLeft: "50px", "& .MuiTabs-indicatorSpan": {
+                        maxWidth: 60,
+                        width: "100%",
+                        backgroundColor: MyTheme.indicatorSpanColor
+                    }
+                }} value={value} onChange={handleChange} aria-label="tabs">
                     <StyledTab label="Home" />
                     <StyledTab label="Projects" />
                     <StyledTab label="Posts" />
@@ -159,52 +196,51 @@ export const Navbar = ({ }) => {
                 </StyledTabs>
             </Box>
     }
-    /* useEffect(() =>{
-         if(themeFnCount === 0){
-             document.getElementById("themeBox")?.addEventListener('click' , () =>{changeTheme()})
-             setthemeFnCount(1)
-         }
-     })*/
-
-    if (theme === false) {
+    
+    
+    if (localStorage.getItem("theme") === "false" || localStorage.getItem("theme") === null) {
+        ToggleThemeButton = <Box onClick={() => {
+            changeToLightTheme();
+        }} id="themeBox" sx={lightBoxComponentStyle}>
+            <LightModeIcon sx={LightModeIconStyle} />
+        </Box>
         document.body.style.backgroundColor = "#212022"
         MyTheme = {
             color: "white",
             indicatorSpanColor: "#FFFFAB",
-
+            background: "rgb(33,32,34,33)"
         }
     }
-    else if (theme === true) {
-        document.body.style.backgroundColor = "#FFCA84"
+    else if (localStorage.getItem("theme") === "true") {
+        ToggleThemeButton = <Box onClick={() => {
+            changeToDarkTheme();
+        }} id="themeBox" sx={darkBoxComponentStyle}>
+            <DarkModeIcon sx={DarkModeIconStyle} />
+        </Box>
+        document.body.style.backgroundColor = "#F0E7DB"
         MyTheme = {
             color: "black",
             indicatorSpanColor: "black",
+            background: "#F0E7DB",
         }
     }
-
-
-
 
     return (
         <Container>
             <nav id="navbar" style={{
                 width: "100%",
                 height: "80px",
-                background: "rgb(33,32,34,33)",
+                background: MyTheme.background,
                 color: MyTheme.color,
                 display: "flex",
                 flexDirection: "row",
-                paddingLeft: navbarPaddingLeft
+                paddingLeft: navbarPaddingLeft,
+                transition: "all 0.3s ease-in-out"
             }}>
-                <div style={{ marginTop: "9px" }}><h1 style={TitleStyle}><a style={{ textDecoration: "none", color: "white" }} href="/">Tanin Limsiriwong</a></h1></div>
-
+                <div style={{ marginTop: "9px" }}><h1 style={TitleStyle}><a style={{ textDecoration: "none", color: MyTheme.color }} href="/">Tanin Limsiriwong</a></h1></div>
                 {DehazeOutlinedComponent}
                 {StyledTabComponent}
-                <Box onClick={() => {
-                    setTheme(!theme)
-                }} id="themeBox" sx={lightBoxComponentStyle}>
-                    <LightModeIcon sx={LightModeIconStyle} />
-                </Box>
+                {ToggleThemeButton}
             </nav>
         </Container>
     )
