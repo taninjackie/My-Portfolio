@@ -34,7 +34,7 @@ const BoxOfLightModeIconStyle: SxProps = {
     },
     transition: "all .35s ease-in-out",
 }
-const BoxOfDarkModeIconStyle:SxProps = {
+const BoxOfDarkModeIconStyle: SxProps = {
     borderRadius: "4px",
     margin: "35px 0 auto 150px",
     width: "40px",
@@ -42,7 +42,7 @@ const BoxOfDarkModeIconStyle:SxProps = {
     backgroundColor: "#805AD5",
     textAlign: "center",
     '&:hover': {
-        backgroundColor: "#F6F65E"
+        backgroundColor: "#721463"
     },
     transition: "all .35s ease-in-out",
 }
@@ -80,7 +80,7 @@ const BoxOfDarkModeIconMobileStyle: SxProps = {
     backgroundColor: "#805AD5",
     textAlign: "center",
     '&:hover': {
-        backgroundColor: "#F6F65E"
+        backgroundColor: "#721463"
     },
     transition: "all .35s ease-in-out",
 }
@@ -133,13 +133,15 @@ export const Navbar = ({ }) => {
     const [value, setValue] = React.useState(Number(null));
     const [theme, setTheme] = useState(false)
 
-    let ToggleThemeButton ;
+    let ToggleThemeButton;
+    let LightThemeButton;
+    let DarkThemeButton;
 
     const changeToLightTheme = () => {
         setTheme(!theme);
         localStorage.setItem("theme", "true");
     }
-    const changeToDarkTheme = () =>{
+    const changeToDarkTheme = () => {
         setTheme(!theme);
         localStorage.setItem("theme", "false");
     }
@@ -158,14 +160,14 @@ export const Navbar = ({ }) => {
 
     //Component Style
     let lightBoxComponentStyle: SxProps;
-    let darkBoxComponentStyle : SxProps;
+    let darkBoxComponentStyle: SxProps;
     //Media Query
     const match925px: boolean = useMediaQuery("(max-width:925px)");
     let navbarPaddingLeft: string = "100px"
 
     if (match925px) {
         lightBoxComponentStyle = BoxOfLightModeIconMobileStyle
-        darkBoxComponentStyle  = BoxOfDarkModeIconMobileStyle
+        darkBoxComponentStyle = BoxOfDarkModeIconMobileStyle
         StyledTabComponent = ""
         navbarPaddingLeft = "5px"
         TitleSize = "27px"
@@ -179,7 +181,7 @@ export const Navbar = ({ }) => {
     }
     else {
         lightBoxComponentStyle = BoxOfLightModeIconStyle
-        darkBoxComponentStyle  = BoxOfDarkModeIconStyle
+        darkBoxComponentStyle = BoxOfDarkModeIconStyle
         StyledTabComponent =
             <Box>
                 <StyledTabs sx={{
@@ -196,10 +198,27 @@ export const Navbar = ({ }) => {
                 </StyledTabs>
             </Box>
     }
-    
-    
+
+    const animateCSS = (element:any, animation:any, prefix = 'animate__') =>
+        // We create a Promise and return it
+        new Promise((resolve, reject) => {
+            const animationName = `${prefix}${animation}`;
+            const node = document.querySelector(element);
+
+            node.classList.add(`${prefix}animated`, animationName);
+
+            // When the animation ends, we clean the classes and resolve the Promise
+            function handleAnimationEnd(event:any) {
+                event.stopPropagation();
+                node.classList.remove(`${prefix}animated`, animationName);
+                resolve('Animation ended');
+            }
+
+            node.addEventListener('animationend', handleAnimationEnd, { once: true });
+        });
+
     if (localStorage.getItem("theme") === "false" || localStorage.getItem("theme") === null) {
-        ToggleThemeButton = <Box onClick={() => {
+        DarkThemeButton = <Box className="animate__animated animate__flipInX" onClick={() => {
             changeToLightTheme();
         }} id="themeBox" sx={lightBoxComponentStyle}>
             <LightModeIcon sx={LightModeIconStyle} />
@@ -210,9 +229,10 @@ export const Navbar = ({ }) => {
             indicatorSpanColor: "#FFFFAB",
             background: "rgb(33,32,34,33)"
         }
+        
     }
     else if (localStorage.getItem("theme") === "true") {
-        ToggleThemeButton = <Box onClick={() => {
+        LightThemeButton = <Box className="animate__animated animate__flipInX" onClick={() => {
             changeToDarkTheme();
         }} id="themeBox" sx={darkBoxComponentStyle}>
             <DarkModeIcon sx={DarkModeIconStyle} />
@@ -227,7 +247,7 @@ export const Navbar = ({ }) => {
 
     return (
         <Container>
-            <nav id="navbar" style={{
+            <nav className="test" id="navbar" style={{
                 width: "100%",
                 height: "80px",
                 background: MyTheme.background,
@@ -235,12 +255,15 @@ export const Navbar = ({ }) => {
                 display: "flex",
                 flexDirection: "row",
                 paddingLeft: navbarPaddingLeft,
-                transition: "all 0.3s ease-in-out"
+                transition: "background 0.3s ease-in-out",
+                position: "fixed"
             }}>
                 <div style={{ marginTop: "9px" }}><h1 style={TitleStyle}><a style={{ textDecoration: "none", color: MyTheme.color }} href="/">Tanin Limsiriwong</a></h1></div>
                 {DehazeOutlinedComponent}
                 {StyledTabComponent}
-                {ToggleThemeButton}
+                {DarkThemeButton}
+                {LightThemeButton}
+                
             </nav>
         </Container>
     )
