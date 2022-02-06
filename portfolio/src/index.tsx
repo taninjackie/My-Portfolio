@@ -1,15 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+//import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Navbar } from './components/navbar';
+import { Home } from './pages/home';
 import 'animate.css';
-
+import { Container } from '@mui/material';
 ReactDOM.render(
   <React.StrictMode>
-    <Navbar/>
-    <App />
+    <Navbar />
+    <Container>
+      <Home />
+    </Container>
   </React.StrictMode>,
   document.getElementById('root')
 );

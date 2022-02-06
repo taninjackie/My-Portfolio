@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Container, Grid, Tabs, Tab, Box } from "@mui/material";
+import React, { useState } from "react";
+import { Container, Tabs, Tab, Box } from "@mui/material";
 import { styled, SxProps } from '@mui/material/styles';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import useMediaQuery from "@mui/material/useMediaQuery";
 import DehazeOutlinedIcon from '@mui/icons-material/DehazeOutlined';
 import CSS from "csstype";
+import "./css/navbarBackDropFilter.css";
+import "./css/navbarMediaQuery.css";
 
 interface StyledTabsProps {
     children?: React.ReactNode;
@@ -14,6 +16,9 @@ interface StyledTabsProps {
 }
 interface StyledTabProps {
     label: string;
+}
+interface NavBarHeightStyle{
+    height :string
 }
 
 //defalut Theme is Black == false
@@ -62,7 +67,7 @@ const DarkModeIconStyle: SxProps = {
 }
 const BoxOfLightModeIconMobileStyle: SxProps = {
     borderRadius: "4px",
-    margin: "35px 0 auto 50px",
+    margin: "35px 0 auto 5px",
     width: "40px",
     height: "30px",
     backgroundColor: "#FFFFAB",
@@ -74,7 +79,7 @@ const BoxOfLightModeIconMobileStyle: SxProps = {
 }
 const BoxOfDarkModeIconMobileStyle: SxProps = {
     borderRadius: "4px",
-    margin: "35px 0 auto 50px",
+    margin: "35px 0 auto 5px",
     width: "40px",
     height: "30px",
     backgroundColor: "#805AD5",
@@ -92,6 +97,8 @@ const DehazeOutlinedBoxStyle: SxProps = {
     textAlign: "center",
     borderRadius: "4px"
 }
+
+
 
 //StyledTabs Varible
 const StyledTabs = styled((props: StyledTabsProps) => (
@@ -133,7 +140,6 @@ export const Navbar = ({ }) => {
     const [value, setValue] = React.useState(Number(null));
     const [theme, setTheme] = useState(false)
 
-    let ToggleThemeButton;
     let LightThemeButton;
     let DarkThemeButton;
 
@@ -145,7 +151,10 @@ export const Navbar = ({ }) => {
         setTheme(!theme);
         localStorage.setItem("theme", "false");
     }
-
+    //Navbar Height
+    let navBarHeight:NavBarHeightStyle = {
+        height : "80px"
+    }
     //TitleStyle
     let TitleSize: string = "25px"
     let TitleStyle: CSS.Properties = {
@@ -162,26 +171,27 @@ export const Navbar = ({ }) => {
     let lightBoxComponentStyle: SxProps;
     let darkBoxComponentStyle: SxProps;
     //Media Query
-    const match925px: boolean = useMediaQuery("(max-width:925px)");
     let navbarPaddingLeft: string = "100px"
 
-    if (match925px) {
+    if (useMediaQuery("(max-width:925px)")) {
         lightBoxComponentStyle = BoxOfLightModeIconMobileStyle
         darkBoxComponentStyle = BoxOfDarkModeIconMobileStyle
         StyledTabComponent = ""
-        navbarPaddingLeft = "5px"
+        navbarPaddingLeft = "280px"
         TitleSize = "27px"
         DehazeOutlinedComponent =
             <>
-                <Box sx={DehazeOutlinedBoxStyle}>
+                <Box id="dropmenu" sx={DehazeOutlinedBoxStyle}>
                     <DehazeOutlinedIcon style={{ color: "black", paddingTop: "3px" }} />
                 </Box>
 
             </>
     }
+    
     else {
         lightBoxComponentStyle = BoxOfLightModeIconStyle
         darkBoxComponentStyle = BoxOfDarkModeIconStyle
+        
         StyledTabComponent =
             <Box>
                 <StyledTabs sx={{
@@ -198,24 +208,8 @@ export const Navbar = ({ }) => {
                 </StyledTabs>
             </Box>
     }
-
-    const animateCSS = (element:any, animation:any, prefix = 'animate__') =>
-        // We create a Promise and return it
-        new Promise((resolve, reject) => {
-            const animationName = `${prefix}${animation}`;
-            const node = document.querySelector(element);
-
-            node.classList.add(`${prefix}animated`, animationName);
-
-            // When the animation ends, we clean the classes and resolve the Promise
-            function handleAnimationEnd(event:any) {
-                event.stopPropagation();
-                node.classList.remove(`${prefix}animated`, animationName);
-                resolve('Animation ended');
-            }
-
-            node.addEventListener('animationend', handleAnimationEnd, { once: true });
-        });
+    if (useMediaQuery("(max-width:360px)"))
+    navBarHeight = {...navBarHeight, height:"130px"}
 
     if (localStorage.getItem("theme") === "false" || localStorage.getItem("theme") === null) {
         DarkThemeButton = <Box className="animate__animated animate__flipInX" onClick={() => {
@@ -227,7 +221,9 @@ export const Navbar = ({ }) => {
         MyTheme = {
             color: "white",
             indicatorSpanColor: "#FFFFAB",
-            background: "rgb(33,32,34,33)"
+            background: "rgb(33,32,34,0.5)",
+            
+            
         }
         
     }
@@ -241,29 +237,29 @@ export const Navbar = ({ }) => {
         MyTheme = {
             color: "black",
             indicatorSpanColor: "black",
-            background: "#F0E7DB",
+            background: "rgb(240,231,219,0.5)",
         }
     }
-
+    
     return (
         <Container>
-            <nav className="test" id="navbar" style={{
+            <nav id="navbar" style={{
                 width: "100%",
-                height: "80px",
+                height: navBarHeight.height,
                 background: MyTheme.background,
                 color: MyTheme.color,
                 display: "flex",
                 flexDirection: "row",
                 paddingLeft: navbarPaddingLeft,
                 transition: "background 0.3s ease-in-out",
-                position: "fixed"
+                position: "fixed",
+                
             }}>
                 <div style={{ marginTop: "9px" }}><h1 style={TitleStyle}><a style={{ textDecoration: "none", color: MyTheme.color }} href="/">Tanin Limsiriwong</a></h1></div>
                 {DehazeOutlinedComponent}
                 {StyledTabComponent}
                 {DarkThemeButton}
-                {LightThemeButton}
-                
+                {LightThemeButton}    
             </nav>
         </Container>
     )

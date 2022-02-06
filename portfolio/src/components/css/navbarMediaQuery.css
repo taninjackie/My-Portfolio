@@ -1,0 +1,39 @@
+@media only screen and (max-width: 746px) {
+    #navbar {
+        margin-left: -150px;
+    }
+}
+
+@media only screen and (max-width: 519px) {
+    #navbar {
+        margin-left: -220px;
+    }
+}
+
+@media only screen and (max-width: 360px) {
+    #navbar {
+        margin-left: -250px;
+        flex-wrap: wrap;
+    }
+    #dropmenu {
+        margin-top: -10px;
+        margin-left: 100px;
+    }
+    #themeBox {
+        margin-top: -10px;
+    }
+}
+
+@media only screen and (max-width: 322px) {
+    #navbar {
+        margin-left: -250px;
+        flex-wrap: wrap;
+    }
+    #dropmenu {
+        margin-top: -10px;
+        margin-left: 100px
+    }
+    #themeBox {
+        margin-top: -10px;
+    }
+}
