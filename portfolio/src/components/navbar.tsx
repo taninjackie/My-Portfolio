@@ -98,8 +98,6 @@ const DehazeOutlinedBoxStyle: SxProps = {
     borderRadius: "4px"
 }
 
-
-
 //StyledTabs Varible
 const StyledTabs = styled((props: StyledTabsProps) => (
     <Tabs
@@ -136,20 +134,19 @@ const StyledTab = styled((props: StyledTabProps) => (
 
 }));
 
-export const Navbar = ({ }) => {
-    const [value, setValue] = React.useState(Number(null));
-    const [theme, setTheme] = useState(false)
+export const Navbar = (props:any) => {
+    const [value, setValue] = useState(Number(null));
 
     let LightThemeButton;
     let DarkThemeButton;
 
     const changeToLightTheme = () => {
-        setTheme(!theme);
         localStorage.setItem("theme", "true");
+        props.changeTheme();
     }
     const changeToDarkTheme = () => {
-        setTheme(!theme);
         localStorage.setItem("theme", "false");
+        props.changeTheme();
     }
     //Navbar Height
     let navBarHeight:NavBarHeightStyle = {
@@ -222,8 +219,6 @@ export const Navbar = ({ }) => {
             color: "white",
             indicatorSpanColor: "#FFFFAB",
             background: "rgb(33,32,34,0.5)",
-            
-            
         }
         
     }
