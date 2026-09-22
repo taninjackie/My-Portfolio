@@ -1,261 +1,228 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Container, Tabs, Tab, Box } from "@mui/material";
-import { styled, SxProps } from '@mui/material/styles';
+import { styled, SxProps, Theme } from '@mui/material/styles';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import useMediaQuery from "@mui/material/useMediaQuery";
 import DehazeOutlinedIcon from '@mui/icons-material/DehazeOutlined';
-import CSS from "csstype";
 import "./css/navbarBackDropFilter.css";
 import "./css/navbarMediaQuery.css";
 
+interface NavbarProps {
+  theme: 'light' | 'dark';
+  onToggleTheme: () => void;
+}
+
 interface StyledTabsProps {
-    children?: React.ReactNode;
-    value: number;
-    onChange: (event: React.SyntheticEvent, newValue: number) => void;
+  children?: React.ReactNode;
+  value: number;
+  onChange: (event: React.SyntheticEvent, newValue: number) => void;
 }
+
 interface StyledTabProps {
-    label: string;
-}
-interface NavBarHeightStyle{
-    height :string
+  label: string;
 }
 
-//defalut Theme is Black == false
-let MyTheme: any = {
+const TABS = ['Home', 'Projects', 'Posts', 'Source'] as const;
+
+// Theme configurations
+const THEME_CONFIG = {
+  dark: {
     color: "white",
-    indicatorSpanColor: "#FFFFAB"
-}
-
-const BoxOfLightModeIconStyle: SxProps = {
-    borderRadius: "4px",
-    margin: "35px 0 auto 150px",
-    width: "40px",
-    height: "30px",
-    backgroundColor: "#FFFFAB",
-    textAlign: "center",
-    '&:hover': {
-        backgroundColor: "#F6F65E"
-    },
-    transition: "all .35s ease-in-out",
-}
-const BoxOfDarkModeIconStyle: SxProps = {
-    borderRadius: "4px",
-    margin: "35px 0 auto 150px",
-    width: "40px",
-    height: "30px",
-    backgroundColor: "#805AD5",
-    textAlign: "center",
-    '&:hover': {
-        backgroundColor: "#721463"
-    },
-    transition: "all .35s ease-in-out",
-}
-const LightModeIconStyle: SxProps = {
-    paddingTop: "6px",
+    indicatorSpanColor: "#FFFFAB",
+    background: "rgb(33,32,34,0.5)",
+    bodyBackground: "#212022",
+    iconBackground: "#805AD5",
+    iconHoverBackground: "#721463",
+  },
+  light: {
     color: "black",
-    justifyContent: "center",
-    fontSize: "medium",
-    textAlign: "center"
-}
-const DarkModeIconStyle: SxProps = {
-    paddingTop: "6px",
-    color: "white",
-    justifyContent: "center",
-    fontSize: "medium",
-    textAlign: "center"
-}
-const BoxOfLightModeIconMobileStyle: SxProps = {
-    borderRadius: "4px",
-    margin: "35px 0 auto 5px",
-    width: "40px",
-    height: "30px",
-    backgroundColor: "#FFFFAB",
-    textAlign: "center",
-    '&:hover': {
-        backgroundColor: "#F6F65E"
-    },
-    transition: "all .35s ease-in-out",
-}
-const BoxOfDarkModeIconMobileStyle: SxProps = {
-    borderRadius: "4px",
-    margin: "35px 0 auto 5px",
-    width: "40px",
-    height: "30px",
-    backgroundColor: "#805AD5",
-    textAlign: "center",
-    '&:hover': {
-        backgroundColor: "#721463"
-    },
-    transition: "all .35s ease-in-out",
-}
-const DehazeOutlinedBoxStyle: SxProps = {
-    width: "40px",
-    height: "30px",
-    background: "white",
-    margin: "35px 0 auto 30px",
-    textAlign: "center",
-    borderRadius: "4px"
-}
+    indicatorSpanColor: "black",
+    background: "rgb(240,231,219,0.5)",
+    bodyBackground: "#F0E7DB",
+    iconBackground: "#FFFFAB",
+    iconHoverBackground: "#F6F65E",
+  },
+};
 
-//StyledTabs Varible
+const getBaseIconSx = (color: string): SxProps<Theme> => ({
+  paddingTop: "6px",
+  color,
+  justifyContent: "center",
+  fontSize: "medium",
+  textAlign: "center"
+});
+
+const getBaseBoxSx = (backgroundColor: string, hoverBackground: string): SxProps<Theme> => ({
+  borderRadius: "4px",
+  width: "40px",
+  height: "30px",
+  backgroundColor,
+  textAlign: "center",
+  '&:hover': {
+    backgroundColor: hoverBackground
+  },
+  transition: "all .35s ease-in-out",
+});
+
 const StyledTabs = styled((props: StyledTabsProps) => (
-    <Tabs
-        {...props}
-        TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
-    />
+  <Tabs
+    {...props}
+    TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
+  />
 ))({
-    "& .MuiTabs-indicator": {
-        display: "flex",
-        justifyContent: "center",
-        backgroundColor: "transparent"
-    },
-    "& .MuiTabs-indicatorSpan": {
-        maxWidth: 60,
-        width: "100%",
-        backgroundColor: "#FFFFAB"
-    }
+  "& .MuiTabs-indicator": {
+    display: "flex",
+    justifyContent: "center",
+    backgroundColor: "transparent"
+  },
+  "& .MuiTabs-indicatorSpan": {
+    maxWidth: 60,
+    width: "100%",
+  }
 });
 
 const StyledTab = styled((props: StyledTabProps) => (
-    <Tab disableRipple {...props} />
+  <Tab disableRipple {...props} />
 ))(({ theme }) => ({
-    textTransform: "none",
-    fontWeight: theme.typography.fontWeightRegular,
-    fontSize: theme.typography.pxToRem(15),
-    marginRight: theme.spacing(1),
-    color: MyTheme.color,
-    "&.Mui-selected": {
-        color: MyTheme.color
-    },
-    "&.Mui-focusVisible": {
-        backgroundColor: "rgba(100, 95, 228, 0.32)"
-    },
-
+  textTransform: "none",
+  fontWeight: theme.typography.fontWeightRegular,
+  fontSize: theme.typography.pxToRem(15),
+  marginRight: theme.spacing(1),
+  "&.Mui-selected": {
+    color: "inherit"
+  },
+  "&.Mui-focusVisible": {
+    backgroundColor: "rgba(100, 95, 228, 0.32)"
+  },
 }));
 
-export const Navbar = (props:any) => {
-    const [value, setValue] = useState(Number(null));
+export const Navbar = ({ theme, onToggleTheme }: NavbarProps) => {
+  const [value, setValue] = useState<number>(0);
+  const isMobile = useMediaQuery("(max-width:925px)");
+  const isExtraSmall = useMediaQuery("(max-width:360px)");
 
-    let LightThemeButton;
-    let DarkThemeButton;
+  const currentTheme = THEME_CONFIG[theme];
 
-    const changeToLightTheme = () => {
-        localStorage.setItem("theme", "true");
-        props.changeTheme();
-    }
-    const changeToDarkTheme = () => {
-        localStorage.setItem("theme", "false");
-        props.changeTheme();
-    }
-    //Navbar Height
-    let navBarHeight:NavBarHeightStyle = {
-        height : "80px"
-    }
-    //TitleStyle
-    let TitleSize: string = "25px"
-    let TitleStyle: CSS.Properties = {
-        fontSize: TitleSize,
-    }
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-        setValue(newValue);
-    };
+  // Update body background and localStorage when theme changes
+  React.useEffect(() => {
+    document.body.style.backgroundColor = currentTheme.bodyBackground;
+    localStorage.setItem("theme", theme === 'dark' ? "false" : "true");
+  }, [theme, currentTheme.bodyBackground]);
 
-    //Component variable
-    let StyledTabComponent, DehazeOutlinedComponent;
+  const handleThemeToggle = useCallback(() => {
+    onToggleTheme();
+  }, [onToggleTheme]);
 
-    //Component Style
-    let lightBoxComponentStyle: SxProps;
-    let darkBoxComponentStyle: SxProps;
-    //Media Query
-    let navbarPaddingLeft: string = "100px"
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
 
-    if (useMediaQuery("(max-width:925px)")) {
-        lightBoxComponentStyle = BoxOfLightModeIconMobileStyle
-        darkBoxComponentStyle = BoxOfDarkModeIconMobileStyle
-        StyledTabComponent = ""
-        navbarPaddingLeft = "280px"
-        TitleSize = "27px"
-        DehazeOutlinedComponent =
-            <>
-                <Box id="dropmenu" sx={DehazeOutlinedBoxStyle}>
-                    <DehazeOutlinedIcon style={{ color: "black", paddingTop: "3px" }} />
-                </Box>
-
-            </>
-    }
-    
-    else {
-        lightBoxComponentStyle = BoxOfLightModeIconStyle
-        darkBoxComponentStyle = BoxOfDarkModeIconStyle
-        
-        StyledTabComponent =
-            <Box>
-                <StyledTabs sx={{
-                    marginTop: "25px", paddingLeft: "50px", "& .MuiTabs-indicatorSpan": {
-                        maxWidth: 60,
-                        width: "100%",
-                        backgroundColor: MyTheme.indicatorSpanColor
-                    }
-                }} value={value} onChange={handleChange} aria-label="tabs">
-                    <StyledTab label="Home" />
-                    <StyledTab label="Projects" />
-                    <StyledTab label="Posts" />
-                    <StyledTab label="Source" />
-                </StyledTabs>
-            </Box>
-    }
-    if (useMediaQuery("(max-width:360px)"))
-    navBarHeight = {...navBarHeight, height:"130px"}
-
-    if (localStorage.getItem("theme") === "false" || localStorage.getItem("theme") === null) {
-        DarkThemeButton = <Box className="animate__animated animate__flipInX" onClick={() => {
-            changeToLightTheme();
-        }} id="themeBox" sx={lightBoxComponentStyle}>
-            <LightModeIcon sx={LightModeIconStyle} />
-        </Box>
-        document.body.style.backgroundColor = "#212022"
-        MyTheme = {
-            color: "white",
-            indicatorSpanColor: "#FFFFAB",
-            background: "rgb(33,32,34,0.5)",
-        }
-        
-    }
-    else if (localStorage.getItem("theme") === "true") {
-        LightThemeButton = <Box className="animate__animated animate__flipInX" onClick={() => {
-            changeToDarkTheme();
-        }} id="themeBox" sx={darkBoxComponentStyle}>
-            <DarkModeIcon sx={DarkModeIconStyle} />
-        </Box>
-        document.body.style.backgroundColor = "#F0E7DB"
-        MyTheme = {
-            color: "black",
-            indicatorSpanColor: "black",
-            background: "rgb(240,231,219,0.5)",
-        }
-    }
+  const renderThemeToggleButton = () => {
+    const isDark = theme === 'dark';
+    const Icon = isDark ? LightModeIcon : DarkModeIcon;
+    const iconColor = isDark ? "black" : "white";
     
     return (
-        <Container>
-            <nav id="navbar" style={{
-                width: "100%",
-                height: navBarHeight.height,
-                background: MyTheme.background,
-                color: MyTheme.color,
-                display: "flex",
-                flexDirection: "row",
-                paddingLeft: navbarPaddingLeft,
-                transition: "background 0.3s ease-in-out",
-                position: "fixed",
-                
-            }}>
-                <div style={{ marginTop: "9px" }}><h1 style={TitleStyle}><a style={{ textDecoration: "none", color: MyTheme.color }} href="/">Tanin Limsiriwong</a></h1></div>
-                {DehazeOutlinedComponent}
-                {StyledTabComponent}
-                {DarkThemeButton}
-                {LightThemeButton}    
-            </nav>
-        </Container>
-    )
-}
+      <Box
+        className="animate__animated animate__flipInX"
+        onClick={handleThemeToggle}
+        id="themeBox"
+        sx={{
+          ...getBaseBoxSx(currentTheme.iconBackground, currentTheme.iconHoverBackground),
+          margin: isMobile ? "35px 0 auto 5px" : "35px 0 auto 150px",
+        }}
+      >
+        <Icon sx={getBaseIconSx(iconColor)} />
+      </Box>
+    );
+  };
+
+  const renderNavigationTabs = () => {
+    if (isMobile) {
+      return null;
+    }
+
+    return (
+      <Box>
+        <StyledTabs
+          sx={{
+            marginTop: "25px",
+            paddingLeft: "50px",
+            "& .MuiTabs-indicatorSpan": {
+              maxWidth: 60,
+              width: "100%",
+              backgroundColor: currentTheme.indicatorSpanColor
+            }
+          }}
+          value={value}
+          onChange={handleTabChange}
+          aria-label="navigation tabs"
+        >
+          {TABS.map((tab) => (
+            <StyledTab key={tab} label={tab} sx={{ color: currentTheme.color }} />
+          ))}
+        </StyledTabs>
+      </Box>
+    );
+  };
+
+  const renderMobileMenuButton = () => {
+    if (!isMobile) {
+      return null;
+    }
+
+    return (
+      <Box
+        id="dropmenu"
+        sx={{
+          width: "40px",
+          height: "30px",
+          background: "white",
+          margin: isExtraSmall ? "-10px 0 auto 100px" : "35px 0 auto 30px",
+          textAlign: "center",
+          borderRadius: "4px"
+        }}
+      >
+        <DehazeOutlinedIcon style={{ color: "black", paddingTop: "3px" }} />
+      </Box>
+    );
+  };
+
+  const navbarHeight = isExtraSmall ? "130px" : "80px";
+  const titleSize = isMobile ? "27px" : "25px";
+  const paddingLeft = isMobile ? "280px" : "100px";
+
+  return (
+    <Container maxWidth={false} disableGutters>
+      <nav
+        id="navbar"
+        style={{
+          width: "100%",
+          height: navbarHeight,
+          background: currentTheme.background,
+          color: currentTheme.color,
+          display: "flex",
+          flexDirection: "row",
+          paddingLeft,
+          transition: "background 0.3s ease-in-out",
+          position: "fixed",
+        }}
+      >
+        <div style={{ marginTop: "9px" }}>
+          <h1 style={{ fontSize: titleSize, margin: 0 }}>
+            <a
+              style={{ textDecoration: "none", color: currentTheme.color }}
+              href="/"
+            >
+              Tanin Limsiriwong
+            </a>
+          </h1>
+        </div>
+        {renderMobileMenuButton()}
+        {renderNavigationTabs()}
+        {renderThemeToggleButton()}
+      </nav>
+    </Container>
+  );
+};
