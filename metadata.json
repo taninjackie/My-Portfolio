@@ -1,0 +1,6 @@
+{
+  "name": "Tanin Limsiriwong Portfolio",
+  "description": "Personal portfolio website of Tanin Limsiriwong built with React and Material UI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
